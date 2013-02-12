@@ -68,6 +68,7 @@ def updateAllPlaylist(config):
       for (key, value) in config.items(section):
          updatePlaylist(config, key)
 
+
 class DisplayInterface(Tkinter.Tk):
 
    def __init__(self,parent,config):
@@ -104,8 +105,6 @@ class DisplayInterface(Tkinter.Tk):
 
 
 def main():
-   iniFile = "playlist.ini"
-
    # argpars
    parser = argparse.ArgumentParser(description='Download music from your Youtube playlist.')
    parser.add_argument('-a', '--all', action='store_true', help="Update all your playlist")
@@ -118,21 +117,18 @@ def main():
       args.gui=1
 
    # Open playlist.ini
+   iniFile = "playlist.ini"
    config = ConfigParser.SafeConfigParser()
    if os.path.isfile(iniFile):
       config.read(iniFile)
    else:
-      print "%s does not exist" % iniFile
-      return
+      sys.exit("playlist file does not exist")
 
-   if args.gui :
+   if args.gui:
       app = DisplayInterface(None, config=config)
-      return
-
-   # Update playlist
-   if args.all :
+   elif args.all:
       updateAllPlaylist(config)
-   else:
+   elif args.playlist:
       updatePlaylists(config, args.playlist)
 
 if __name__ == "__main__":
