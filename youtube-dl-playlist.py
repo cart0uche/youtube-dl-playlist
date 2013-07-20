@@ -95,11 +95,16 @@ def main():
 		for playlist in config.options('Music'):
 			playlists.append(["", playlist])
 		list_result = PyZenity.List(["select", "playlist"], boolstyle="checklist", data=playlists)
-		PyZenity.InfoMessage("Press ok to start download")
-		for music in list_result:
-			updatePlaylists(config, [music])
-		PyZenity.InfoMessage("All done !")
 
+		progression_callback = PyZenity.Progress(text="Downloading videos and converting in mp3")
+
+		i = 0
+		for music in list_result:
+			progression_callback(100*i/len(list_result), "Download playlist : " + music)
+			updatePlaylists(config, [music])
+			i = i+1
+
+		progression_callback(100, "Enjoy.")
 
 if __name__ == "__main__":
 	main()
