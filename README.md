@@ -8,8 +8,8 @@ Requirements:
 
 Usage:
 ------
-  - With GUI: <blockquote>python youtube-dl-playlist</blockquote>
-  - Without GUI : <blockquote>python youtube-dl-playlist [name_playlist | all]</blockquote>
+  - With GUI: <blockquote>python youtube-dl-playlist.py</blockquote>
+  - Without GUI : <blockquote>python youtube-dl-playlist.py [name_playlist | all]</blockquote>
 
 File playlist.ini:
 ------------------
