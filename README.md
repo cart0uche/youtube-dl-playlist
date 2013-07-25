@@ -3,9 +3,9 @@ youtube-dl-playlist
 
 Requirements:
 -------------
-  - [youtube-dl](https://github.com/rg3/youtube-dl)
-It must be up to date, check if with this command (two times if needed)
-<blockquote>youtube-dl -U<blockquote>
+  - [youtube-dl](https://github.com/rg3/youtube-dl):
+it must be up to date, check if with this command (two times if needed)
+<blockquote>youtube-dl -U</blockquote>
 
 
 Usage:
