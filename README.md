@@ -4,7 +4,6 @@ youtube-dl-playlist
 Requirements:
 -------------
   - [youtube-dl](https://github.com/rg3/youtube-dl)
-  - [PyZenity](https://pypi.python.org/pypi/PyZenity)
 
 Usage:
 ------
