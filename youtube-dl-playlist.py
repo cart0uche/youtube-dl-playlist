@@ -107,18 +107,15 @@ def main():
 		updatePlaylists(config, args.playlist)
 
 	else:
-		playlists = []
-		for playlist in config.options('Music'):
-			playlists.append(["", playlist])
+		print config.options('Music')
+		playlists = [["", playlist] for playlist in config.options('Music')]
 		list_result = PyZenity.List(["", "playlist"], boolstyle="checklist", data=playlists)
 
 		progression_callback = PyZenity.Progress(text="Downloading videos and converting in mp3")
 
-		i = 0
-		for music in list_result:
+		for i, music in enumerate(list_result):
 			progression_callback(100*i/len(list_result), "Download playlist : " + music)
 			updatePlaylists(config, [music])
-			i = i+1
 
 		progression_callback(100, "Enjoy.")
 
