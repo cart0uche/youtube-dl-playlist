@@ -7,6 +7,10 @@ Requirements:
 it must be up to date, check it with this command (two times if needed)
 <blockquote>youtube-dl -U</blockquote>
 
+  - BeautifulSoup, on Ubuntu :
+<blockquote>sudo apt-get install python-beautifulsoup</blockquote>
+
+
 
 Usage:
 ------
@@ -15,6 +19,10 @@ Usage:
 
 File playlist.ini:
 ------------------
+
+When you launch the script the first time, no playlists is record in the playlist.ini file.
+So it will ask your Youtube identifier to construct automatically your playlist.
+
 <blockquote>
 test=PLivBbUaI8nnSU_k_y2WYVgX8H5SDJpFeX
 </blockquote>

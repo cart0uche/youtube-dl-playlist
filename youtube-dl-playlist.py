@@ -8,11 +8,13 @@ import ConfigParser
 import argparse
 import glob
 import shutil
+import urllib
 import PyZenity
+from BeautifulSoup import BeautifulSoup
 
 
-dirVideoName = ".video"
-
+VIDEO_DIRECTORY = '.video'
+CONFIG_MUSIC = 'Music'
 
 def getPlaylistCode(config, playlist_name):
 	for section in config.sections():
@@ -26,8 +28,8 @@ def getPlaylistCode(config, playlist_name):
 def createFolder(playlist_name):
 	if os.path.isdir(playlist_name) is False:
 		os.mkdir(playlist_name)
-		os.mkdir(os.path.join(playlist_name, dirVideoName))
-		print "Folder %s and %s created" % (playlist_name, os.path.join(playlist_name, dirVideoName))
+		os.mkdir(os.path.join(playlist_name, VIDEO_DIRECTORY))
+		print "Folder %s and %s created" % (playlist_name, os.path.join(playlist_name, VIDEO_DIRECTORY))
 
 
 def updatePlaylist(config, playlist_name):
@@ -46,7 +48,7 @@ def updatePlaylist(config, playlist_name):
 	audio_quality = config.get("Config", "audio_quality") if config.get("Config", "audio_quality") not in ["", None] else "0"
 	command = 'youtube-dl --title --continue --ignore-errors --no-overwrite --no-post-overwrites --keep-video --extract-audio --audio-format ' + audio_format + ' --audio-quality ' + audio_quality + ' ' + playlist_code
 	print command
-	os.chdir(os.path.join(playlist_name, dirVideoName))
+	os.chdir(os.path.join(playlist_name, VIDEO_DIRECTORY))
 	os.system(command)
 
 	# Move audio file into user directory and replace by empty one
@@ -77,6 +79,32 @@ def updateAllPlaylist(config):
 		for (key, value) in config.items(section):
 			updatePlaylist(config, key)
 
+def genere_playslists_code(youtube_user_name, ini_file):
+	page_html = urllib.urlopen('https://www.youtube.com/user/%s' % youtube_user_name)
+	soup = BeautifulSoup(page_html.read())
+	soup_channel_id = soup.find('meta', attrs={'itemprop': 'channelId'})
+	channel_id = soup_channel_id['content']
+	print 'channel_id = ' + channel_id
+
+	page_html = urllib.urlopen('https://www.youtube.com/channel/%s/videos?feature=guide&view=1' %channel_id)
+	soup = BeautifulSoup(page_html.read())
+	soup_channel_id = soup.findAll('div', attrs={'data-context-item-user': youtube_user_name, 'data-context-item-type': 'playlist'})
+
+	playlists_code = [(playlist['data-context-item-title'], playlist['data-context-item-id']) for i, playlist in enumerate(soup_channel_id)]
+	print playlists_code
+
+	if len(playlists_code) == 0:
+		PyZenity.Warning('No playlist has been added with user %s.\nLogin is case sensitive and your playlists must be public.' % youtube_user_name)
+		return
+
+	config = ConfigParser.RawConfigParser()
+	config.read('playlist.ini')
+	for playlist_code in playlists_code:
+		config.set(CONFIG_MUSIC, playlist_code[0], playlist_code[1])
+
+	with open(ini_file, 'wb') as configfile:
+		config.write(configfile)
+
 
 def main():
 	# argpars
@@ -86,10 +114,10 @@ def main():
 	args = parser.parse_args()
 
 	# Open playlist.ini
-	iniFile = "playlist.ini"
+	ini_file = "playlist.ini"
 	config = ConfigParser.SafeConfigParser()
-	if os.path.isfile(iniFile):
-		config.read(iniFile)
+	if os.path.isfile(ini_file):
+		config.read(ini_file)
 	else:
 		sys.exit("Playlist file does not exist")
 
@@ -100,6 +128,11 @@ def main():
 		else:
 			os.chdir(output_path)
 
+	if len(config.options(CONFIG_MUSIC)) == 0:
+		youtube_user_name = PyZenity.GetText(text="Enter your Youtube login (no password required): ", entry_text="", password=False)
+		genere_playslists_code(youtube_user_name, ini_file)
+		config.read(ini_file)
+
 	if args.all:
 		updateAllPlaylist(config)
 
@@ -107,9 +140,11 @@ def main():
 		updatePlaylists(config, args.playlist)
 
 	else:
-		print config.options('Music')
-		playlists = [["", playlist] for playlist in config.options('Music')]
-		list_result = PyZenity.List(["", "playlist"], boolstyle="checklist", data=playlists)
+		print config.options(CONFIG_MUSIC)
+		playlists = [["", playlist] for playlist in config.options(CONFIG_MUSIC)]
+		list_result = PyZenity.List(["", "playlist"], title="Select one or more playlist", boolstyle="checklist", data=playlists)
+		if list_result is None or list_result == ['']:
+			sys.exit()
 
 		progression_callback = PyZenity.Progress(text="Downloading videos and converting in mp3")
 
