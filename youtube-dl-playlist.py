@@ -90,7 +90,7 @@ def genere_playslists_code(youtube_user_name, ini_file):
 	soup = BeautifulSoup(page_html.read())
 	soup_channel_id = soup.findAll('div', attrs={'data-context-item-user': youtube_user_name, 'data-context-item-type': 'playlist'})
 
-	playlists_code = [(playlist['data-context-item-title'], playlist['data-context-item-id']) for i, playlist in enumerate(soup_channel_id)]
+	playlists_code = [(playlist['data-context-item-title'], playlist['data-context-item-id']) for playlist in soup_channel_id]
 	print playlists_code
 
 	if len(playlists_code) == 0:
