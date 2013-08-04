@@ -16,7 +16,7 @@ from BeautifulSoup import BeautifulSoup
 VIDEO_DIRECTORY = '.video'
 CONFIG_MUSIC = 'Music'
 
-def getPlaylistCode(config, playlist_name):
+def get_paylist_code(config, playlist_name):
 	for section in config.sections():
 		for (key, value) in config.items(section):
 			if playlist_name == key:
@@ -25,23 +25,23 @@ def getPlaylistCode(config, playlist_name):
 	return None
 
 
-def createFolder(playlist_name):
+def create_folder(playlist_name):
 	if os.path.isdir(playlist_name) is False:
 		os.mkdir(playlist_name)
 		os.mkdir(os.path.join(playlist_name, VIDEO_DIRECTORY))
 		print "Folder %s and %s created" % (playlist_name, os.path.join(playlist_name, VIDEO_DIRECTORY))
 
 
-def updatePlaylist(config, playlist_name):
+def update_playlist(config, playlist_name):
 	# Get playlist code
 	print "Update playlist " + playlist_name
-	playlist_code = getPlaylistCode(config, playlist_name)
+	playlist_code = get_paylist_code(config, playlist_name)
 	if playlist_code is None:
 		print playlist_name + " has no code. Check your playlist.ini"
 		return
 
 	# Create folder if needed
-	createFolder(playlist_name)
+	create_folder(playlist_name)
 
 	# Call to youtube-dl
 	audio_format = config.get("Config", "audio_format") if config.get("Config", "audio_format") not in ["", None] else "mp3"
@@ -69,15 +69,15 @@ def updatePlaylist(config, playlist_name):
 	os.chdir(os.pardir)
 
 
-def updatePlaylists(config, playlistsName):
+def update_playlists(config, playlistsName):
 	for playlistName in playlistsName:
-		updatePlaylist(config, playlistName)
+		update_playlist(config, playlistName)
 
 
-def updateAllPlaylist(config):
+def update_all_playlist(config):
 	for section in config.sections():
 		for (key, value) in config.items(section):
-			updatePlaylist(config, key)
+			update_playlist(config, key)
 
 def genere_playslists_code(youtube_user_name, ini_file):
 	page_html = urllib.urlopen('https://www.youtube.com/user/%s' % youtube_user_name)
@@ -134,10 +134,10 @@ def main():
 		config.read(ini_file)
 
 	if args.all:
-		updateAllPlaylist(config)
+		update_all_playlist(config)
 
 	elif args.playlist:
-		updatePlaylists(config, args.playlist)
+		update_playlists(config, args.playlist)
 
 	else:
 		print config.options(CONFIG_MUSIC)
@@ -150,7 +150,7 @@ def main():
 
 		for i, music in enumerate(list_result):
 			progression_callback(100*i/len(list_result), "Download playlist : " + music)
-			updatePlaylists(config, [music])
+			update_playlists(config, [music])
 
 		progression_callback(100, "Enjoy.")
 
